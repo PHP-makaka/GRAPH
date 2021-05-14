@@ -2,8 +2,14 @@ const $canvas = document.getElementById("container-graph")
 const ctx = $canvas.getContext('2d');
 const $submitValue = document.getElementById("submit")
 const arr_XY = document.getElementById('value_X_Y')
-
-
+const reg =/^\d{1,}$/
+let regByl =''
+document.onkeydown = function (e) {
+    if (e.shiftKey) {
+        console.log("shift")
+        e.preventDefault()
+    }
+}
 $submitValue.addEventListener("click", drowGraphCheck)
 
 let maxValue = 500;
@@ -41,14 +47,14 @@ function centerOrdinat(arr) {
         y: '',
     }
     arrX.map(el => {
-        if (el > 0) {
+        if (el >= 0) {
             return byl.x += "+"
         } else {
             byl.x += "-"
         }
     })
     arrY.map(el => {
-        if (el > 0) {
+        if (el >= 0) {
             return byl.y += "+"
         } else {
             byl.y += "-"
@@ -85,8 +91,14 @@ function centerOrdinat(arr) {
     maxValueY = Math.abs(miN__Y) + Math.abs(max__Y)
 
     let koeffGrafX = 500 / (maxValueX)
+    if (!isFinite(koeffGrafX)) {
+        koeffGrafX = 0
+    }
 
     let koeffGrafY = 500 / (maxValueY)
+    if (!isFinite(koeffGrafY)) {
+        koeffGrafY = 0
+    }
 
     let coordZeroX = koeffGrafX * minX.rez
     let coordZeroY = koeffGrafY * minY.rez
@@ -249,10 +261,11 @@ function drowGraphCheck(e) {
 
     ctx.clearRect(0, 0, $canvas.width, $canvas.height)
 
-    maxValue = 250
-    let arrNum = arr_XY.value.split('\n')
+    maxValue = 250;
+   console.log(/^[\d.,:]+$/.test(arr_XY))
+    let arrNum = arr_XY.value.replace(/ {1,}/g, " ").split('\n')
     console.log(arrNum, "asdsa1111111111", "")
-    let arrNum1= []
+    let arrNum1 = []
     arrNum = arrNum.map((el, indx) => {
         if (!el) {
             return
@@ -260,11 +273,22 @@ function drowGraphCheck(e) {
     });
 
     arrNum1.filter(el => {
-        if (el==undefined) {
+
+        if (el == undefined) {
             return;
         } else {
             el.map((num, ind) => {
-                return    el[ind] = Number(el[ind].replace(',', '.'))
+                el[ind] = Number(el[ind].replace(',', '.'))
+                if (isNaN(el[ind])){
+                    console.log(el[ind],/^[\d.,:]+$/.test(el[ind]))
+                    regByl+="-"
+                }else {
+                    regByl+="+"
+                    console.log("hell",regByl)
+                }
+
+                    return el[ind]
+
 
                 if (Math.abs(el[ind]) > maxValue) {
                     maxValue = Math.abs(el[ind]);
@@ -273,7 +297,11 @@ function drowGraphCheck(e) {
             })
         }
     })
+    if (regByl.indexOf('-')<0){
     console.log(arrNum, "asdsa1111111111")
     centerOrdinat(arrNum1)
-
+    }else {
+        regByl=""
+      alert("Nevernoe znachenie!")
+    }
 }
